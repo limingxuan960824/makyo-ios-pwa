@@ -3,7 +3,9 @@ import { readRomMetadata } from "./rom-utils.js";
 const DB_NAME = "makyo-toitsusen-local";
 const STORE_NAME = "roms";
 const ROM_KEY = "active";
-const CORE_DATA_URL = "https://cdn.emulatorjs.org/stable/data/";
+const EMULATOR_DATA_URL = new URL("./vendor/emulatorjs/4.2.3/data/", location.href).href;
+const EMULATOR_READY_TIMEOUT = 45_000;
+const EMULATOR_START_TIMEOUT = 90_000;
 
 const importView = document.querySelector("#import-view");
 const playerView = document.querySelector("#player-view");
@@ -13,15 +15,62 @@ const replaceButton = document.querySelector("#replace-rom");
 const fullscreenButton = document.querySelector("#fullscreen");
 const toolbar = document.querySelector("#toolbar");
 const status = document.querySelector("#status");
+const game = document.querySelector("#game");
+const playerOverlay = document.querySelector("#player-overlay");
+const playerMessage = document.querySelector("#player-message");
+const retryButton = document.querySelector("#retry-player");
 
 let dbPromise;
 let activeObjectUrl;
 let emulatorStarted = false;
+let emulatorReady = false;
+let emulatorReadyTimer;
+let emulatorStartTimer;
+let emulatorErrorObserver;
 
 function setStatus(message, kind = "") {
   status.textContent = message;
   if (kind) status.dataset.kind = kind;
   else delete status.dataset.kind;
+}
+
+function showPlayerMessage(message, kind = "loading") {
+  playerMessage.textContent = message;
+  playerOverlay.dataset.kind = kind;
+  playerOverlay.hidden = false;
+  retryButton.hidden = kind !== "error";
+  playerView.setAttribute("aria-busy", kind === "loading" ? "true" : "false");
+}
+
+function hidePlayerMessage() {
+  playerOverlay.hidden = true;
+  playerView.setAttribute("aria-busy", "false");
+}
+
+function failEmulator(message, error) {
+  clearTimeout(emulatorReadyTimer);
+  clearTimeout(emulatorStartTimer);
+  emulatorReady = false;
+  playerView.dataset.state = "error";
+  showPlayerMessage(message, "error");
+  if (error) console.error(error);
+}
+
+function observeEmulatorErrors() {
+  emulatorErrorObserver = new MutationObserver(() => {
+    const errorText = game.querySelector(".ejs_error_text");
+    if (!errorText) return;
+
+    const detail = errorText.textContent?.trim();
+    failEmulator(detail ? `启动失败：${detail}` : "游戏启动失败，请重新加载");
+  });
+
+  emulatorErrorObserver.observe(game, {
+    attributes: true,
+    attributeFilter: ["class"],
+    childList: true,
+    subtree: true,
+  });
 }
 
 function openDatabase() {
@@ -78,10 +127,10 @@ async function inspectRom(file) {
 function loadEmulatorScript() {
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = `${CORE_DATA_URL}loader.js`;
+    script.src = `${EMULATOR_DATA_URL}loader.js`;
     script.async = true;
     script.onload = resolve;
-    script.onerror = () => reject(new Error("模拟核心载入失败"));
+    script.onerror = () => reject(new Error("模拟器组件载入失败"));
     document.body.appendChild(script);
   });
 }
@@ -94,28 +143,47 @@ async function launchRom(record) {
   playerView.hidden = false;
   toolbar.hidden = false;
   document.body.dataset.mode = "playing";
+  playerView.dataset.state = "preparing";
+  showPlayerMessage("正在准备本地模拟器");
 
   activeObjectUrl = URL.createObjectURL(record.blob);
   window.EJS_player = "#game";
   window.EJS_core = "segaMD";
   window.EJS_gameUrl = activeObjectUrl;
   window.EJS_gameName = "幽游白书 魔强统一战";
-  window.EJS_pathtodata = CORE_DATA_URL;
-  window.EJS_startOnLoaded = true;
+  window.EJS_pathtodata = EMULATOR_DATA_URL;
+  window.EJS_DEBUG_XX = true;
+  window.EJS_language = "zh-CN";
+  window.EJS_startOnLoaded = false;
+  window.EJS_startButtonName = "开始游戏";
+  window.EJS_alignStartButton = "center";
+  window.EJS_threads = false;
   window.EJS_color = "#e63f36";
   window.EJS_backgroundColor = "#000000";
+  window.EJS_ready = () => {
+    clearTimeout(emulatorReadyTimer);
+    emulatorReady = true;
+    playerView.dataset.state = "ready";
+    hidePlayerMessage();
+  };
+  window.EJS_onGameStart = () => {
+    clearTimeout(emulatorStartTimer);
+    emulatorReady = true;
+    playerView.dataset.state = "running";
+    hidePlayerMessage();
+  };
+
+  observeEmulatorErrors();
+  emulatorReadyTimer = setTimeout(() => {
+    if (!emulatorReady) {
+      failEmulator("模拟器准备超时，请重新加载");
+    }
+  }, EMULATOR_READY_TIMEOUT);
 
   try {
     await loadEmulatorScript();
   } catch (error) {
-    emulatorStarted = false;
-    playerView.hidden = true;
-    toolbar.hidden = true;
-    importView.hidden = false;
-    setStatus("模拟核心载入失败，请联网后重试", "error");
-    chooseButton.textContent = "重新选择 ROM";
-    URL.revokeObjectURL(activeObjectUrl);
-    activeObjectUrl = null;
+    failEmulator("模拟器组件载入失败，请重新加载", error);
   }
 }
 
@@ -165,6 +233,22 @@ function openRomPicker() {
 chooseButton.addEventListener("click", openRomPicker);
 replaceButton.addEventListener("click", openRomPicker);
 fileInput.addEventListener("change", () => handleFile(fileInput.files?.[0]));
+game.addEventListener(
+  "click",
+  (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest(".ejs_start_button")) return;
+    playerView.dataset.state = "starting";
+    clearTimeout(emulatorStartTimer);
+    emulatorStartTimer = setTimeout(() => {
+      failEmulator("游戏启动超时，请重新加载");
+    }, EMULATOR_START_TIMEOUT);
+  },
+  { capture: true }
+);
+retryButton.addEventListener("click", () => {
+  retryButton.disabled = true;
+  location.reload();
+});
 
 fullscreenButton.addEventListener("click", async () => {
   try {
@@ -180,6 +264,9 @@ fullscreenButton.addEventListener("click", async () => {
 });
 
 window.addEventListener("beforeunload", () => {
+  clearTimeout(emulatorReadyTimer);
+  clearTimeout(emulatorStartTimer);
+  emulatorErrorObserver?.disconnect();
   if (activeObjectUrl) URL.revokeObjectURL(activeObjectUrl);
 });
 
