@@ -113,7 +113,7 @@ async function launchRom(record) {
     toolbar.hidden = true;
     importView.hidden = false;
     setStatus("模拟核心载入失败，请联网后重试", "error");
-    chooseButton.textContent = "重试";
+    chooseButton.textContent = "重新选择 ROM";
     URL.revokeObjectURL(activeObjectUrl);
     activeObjectUrl = null;
   }
@@ -150,16 +150,20 @@ async function handleFile(file) {
   }
 }
 
-chooseButton.addEventListener("click", async () => {
-  const stored = await getStoredRom().catch(() => null);
-  if (stored && chooseButton.textContent === "重试") {
-    await launchRom(stored);
-    return;
+function openRomPicker() {
+  try {
+    if (typeof fileInput.showPicker === "function") {
+      fileInput.showPicker();
+      return;
+    }
+  } catch {
+    // Safari versions without showPicker still support a synchronous click.
   }
   fileInput.click();
-});
+}
 
-replaceButton.addEventListener("click", () => fileInput.click());
+chooseButton.addEventListener("click", openRomPicker);
+replaceButton.addEventListener("click", openRomPicker);
 fileInput.addEventListener("change", () => handleFile(fileInput.files?.[0]));
 
 fullscreenButton.addEventListener("click", async () => {

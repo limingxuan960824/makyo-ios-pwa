@@ -1,10 +1,10 @@
-const VERSION = "makyo-shell-v4";
+const VERSION = "makyo-shell-v5";
 const CORE_CACHE = "makyo-core-v1";
 const APP_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=4",
-  "./app.js?v=4",
+  "./styles.css?v=5",
+  "./app.js?v=5",
   "./rom-utils.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
