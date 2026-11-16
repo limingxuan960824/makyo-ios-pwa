@@ -1,0 +1,6 @@
+.tools/
+*.bin
+*.gen
+*.smd
+.DS_Store
+

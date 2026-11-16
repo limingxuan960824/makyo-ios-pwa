@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#090b0d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="魔强统一战" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>幽游白书：魔强统一战</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
+  </head>
+  <body>
+    <div class="app-shell" id="app">
+      <header class="topbar">
+        <div class="brand-block">
+          <span class="brand-mark" aria-hidden="true">灵</span>
+          <div>
+            <p class="series-name">幽游白书</p>
+            <h1>魔强统一战</h1>
+          </div>
+        </div>
+        <div class="toolbar" id="toolbar" hidden>
+          <button class="text-button" id="replace-rom" type="button">更换 ROM</button>
+          <button class="icon-button" id="fullscreen" type="button" title="全屏" aria-label="全屏">⛶</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="import-view" id="import-view" aria-labelledby="import-title">
+          <div class="title-lockup">
+            <span class="edition">MEGA DRIVE</span>
+            <h2 id="import-title">魔强统一战</h2>
+            <p class="game-code">GM G-004122-00</p>
+          </div>
+
+          <div class="fighter-lines" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+
+          <input id="rom-file" type="file" accept=".bin,.md,.gen,.smd,application/octet-stream" hidden />
+          <button class="primary-button" id="choose-rom" type="button">选择 ROM</button>
+          <p class="status" id="status" role="status" aria-live="polite">等待本机游戏文件</p>
+        </section>
+
+        <section class="player-view" id="player-view" aria-label="游戏画面" hidden>
+          <div id="game"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js?v=4"></script>
+  </body>
+</html>

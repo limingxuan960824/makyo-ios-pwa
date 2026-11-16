@@ -1,0 +1,388 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+  background: #090b0d;
+  color: #f4f2e9;
+  letter-spacing: 0;
+  -webkit-tap-highlight-color: transparent;
+  --ink: #090b0d;
+  --paper: #f4f2e9;
+  --red: #e63f36;
+  --green: #49d69b;
+  --gold: #f3c64d;
+  --line: #30343a;
+}
+
+* {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+body {
+  min-height: 100dvh;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100%;
+  height: 100dvh;
+  min-height: 420px;
+  background: var(--ink);
+}
+
+.topbar {
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 66px;
+  padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--line);
+  background: #111418;
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border: 2px solid var(--green);
+  color: var(--green);
+  font-family: "Microsoft YaHei UI", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.series-name,
+.topbar h1 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.series-name {
+  color: #aeb5bd;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.topbar h1 {
+  overflow: hidden;
+  color: var(--paper);
+  font-size: 16px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar[hidden] {
+  display: none;
+}
+
+.text-button,
+.icon-button {
+  height: 40px;
+  border: 1px solid #3f454d;
+  border-radius: 4px;
+  background: #1b1f24;
+  color: var(--paper);
+}
+
+.text-button {
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.icon-button {
+  width: 40px;
+  padding: 0;
+  font-size: 25px;
+  line-height: 1;
+}
+
+main {
+  min-height: 0;
+}
+
+.import-view {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  width: min(100%, 760px);
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 32px 24px max(32px, env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.import-view[hidden] {
+  display: none;
+}
+
+.import-view::before,
+.import-view::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.import-view::before {
+  inset: 24px;
+  border: 1px solid #292d32;
+}
+
+.import-view::after {
+  width: 170px;
+  height: 170px;
+  border: 22px solid #171b1f;
+  transform: rotate(45deg);
+}
+
+.title-lockup {
+  z-index: 1;
+  text-align: center;
+}
+
+.edition {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 8px 4px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.title-lockup h2 {
+  max-width: 100%;
+  margin: 0;
+  color: var(--paper);
+  font-size: 44px;
+  line-height: 1.1;
+}
+
+.game-code {
+  margin: 12px 0 0;
+  color: #777f88;
+  font-family: Consolas, monospace;
+  font-size: 12px;
+}
+
+.fighter-lines {
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: min(360px, 80vw);
+  height: 8px;
+  margin: 32px 0 36px;
+  gap: 6px;
+}
+
+.fighter-lines span:nth-child(1) { background: var(--red); }
+.fighter-lines span:nth-child(2) { background: var(--green); }
+.fighter-lines span:nth-child(3) { background: var(--gold); }
+.fighter-lines span:nth-child(4) { background: #e7e9ed; }
+
+.primary-button {
+  z-index: 1;
+  min-width: 184px;
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 4px;
+  background: var(--red);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 5px 5px 0 #5e1713;
+}
+
+.primary-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 #5e1713;
+}
+
+.primary-button[disabled] {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.status {
+  z-index: 1;
+  min-height: 20px;
+  margin: 18px 0 0;
+  color: #9aa2aa;
+  font-size: 13px;
+  text-align: center;
+}
+
+.status[data-kind="error"] {
+  color: #ff766e;
+}
+
+.status[data-kind="ok"] {
+  color: var(--green);
+}
+
+.player-view {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #000;
+}
+
+.player-view[hidden] {
+  display: none;
+}
+
+#game,
+#game > div {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0;
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    min-height: 360px;
+  }
+
+  .topbar {
+    min-height: 58px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: 8px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    font-size: 18px;
+  }
+
+  .title-lockup h2 {
+    font-size: 32px;
+  }
+
+  .text-button {
+    width: 40px;
+    padding: 0;
+    overflow: hidden;
+    color: transparent;
+    font-size: 0;
+  }
+
+  .text-button::after {
+    content: "↻";
+    color: var(--paper);
+    font-size: 24px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .app-shell {
+    min-height: 0;
+  }
+
+  .topbar {
+    min-height: 50px;
+    padding-top: max(6px, env(safe-area-inset-top));
+    padding-bottom: 6px;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    font-size: 17px;
+  }
+
+  .series-name {
+    display: none;
+  }
+
+  .import-view {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    padding-top: 18px;
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
+  .title-lockup {
+    grid-row: 1 / 3;
+  }
+
+  .title-lockup h2 {
+    font-size: 34px;
+  }
+
+  .fighter-lines {
+    width: min(280px, 38vw);
+    margin: 0 0 18px;
+  }
+
+  .primary-button {
+    min-height: 46px;
+  }
+
+  .status {
+    position: absolute;
+    bottom: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
